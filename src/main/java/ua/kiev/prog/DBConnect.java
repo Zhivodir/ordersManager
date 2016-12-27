@@ -23,31 +23,40 @@ public class DBConnect {
     }
 
     public void initDB() throws SQLException {
-//
-//        Statement st = connection.createStatement();
-//        try {
-//            st.execute("CREATE DATABASE  IF NOT EXISTS `apartments`");
-//            st.execute("DROP TABLE IF EXISTS flats");
-//            st.execute("CREATE TABLE `flats` (\n" +
-//                    "  `id` int(2) NOT NULL AUTO_INCREMENT,\n" +
-//                    "  `district` varchar(45) NOT NULL,\n" +
-//                    "  `address` varchar(45) NOT NULL,\n" +
-//                    "  `area` double NOT NULL,\n" +
-//                    "  `rooms` int(2) NOT NULL,\n" +
-//                    "  `price` double NOT NULL,\n" +
-//                    "  PRIMARY KEY (`id`)\n" +
-//                    ") ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;");
-//            st.execute("INSERT INTO `flats` VALUES (1,'Darnitsa','Voskresenskaya 14',100,3,90000),\n" +
-//                    "  (2,'Darnitsa','Voskresenskaya 14',55,1,45000),\n" +
-//                    "  (3,'Borschagovka','Ulica 22',85,3,70000),\n" +
-//                    "  (4,'Sviatoshin','Pobedi 2',100,3,95000),\n" +
-//                    "  (5,'Darnitsa','Voskresenskaya 12',50,1,40000);");
-//        } finally {
-//            st.close();
-//        }
+
+        Statement st = connection.createStatement();
+        try {
+            st.execute("CREATE DATABASE  IF NOT EXISTS `bd_orders`");
+            st.execute("DROP TABLE IF EXISTS clients");
+            st.execute("DROP TABLE IF EXISTS goods");
+            st.execute("DROP TABLE IF EXISTS orders");
+            st.execute("DROP TABLE IF EXISTS goodsinorders");
+            st.execute("CREATE TABLE `clients` (\n" +
+                    "  `id` int(3) NOT NULL AUTO_INCREMENT,\n" +
+                    "  `name` varchar(45) NOT NULL,\n" +
+                    "  PRIMARY KEY (`id`)\n" +
+                    ") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+            st.execute("CREATE TABLE `goods` (\n" +
+                    "  `id` int(3) NOT NULL AUTO_INCREMENT,\n" +
+                    "  `name` varchar(45) NOT NULL,\n" +
+                    "  `price` double NOT NULL,\n" +
+                    "  PRIMARY KEY (`id`)\n" +
+                    ") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+            st.execute("CREATE TABLE `orders` (\n" +
+                    "  `id` int(3) NOT NULL AUTO_INCREMENT,\n" +
+                    "  `id_client` int(3) NOT NULL,\n" +
+                    "  `date` TIMESTAMP NOT NULL,\n" +
+                    "  PRIMARY KEY (`id`)\n" +
+                    ") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+            st.execute("CREATE TABLE `goodsinorders` (\n" +
+                    "  `id_good` int(3) NOT NULL,\n" +
+                    "  `id_order` int(3) NOT NULL\n" +
+                    ") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+        } finally {
+            st.close();
+        }
         Operations operations = new Operations(this);
     }
-
     public Connection getConnection() {
         return connection;
     }

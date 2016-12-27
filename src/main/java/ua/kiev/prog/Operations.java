@@ -28,7 +28,6 @@ public class Operations {
             System.out.println("1.Add new client");
             System.out.println("2.Add new good");
             System.out.println("3.Create new order");
-            System.out.println("4.Cancel new order");
 
             int choice = Integer.parseInt(sc.nextLine());
             select(choice);
@@ -45,8 +44,6 @@ public class Operations {
                 break;
             case 3:
                 addOrder();
-                break;
-            case 4:
                 break;
             default:
                 break;
@@ -94,7 +91,8 @@ public class Operations {
         }catch(SQLException e){e.printStackTrace();}
         selectGoods();
 
-        while(true) {
+        boolean flag = true;
+        while(flag) {
             System.out.println("Add new good into order(enter id): ");
             String enter = sc.nextLine();
             if(enter.equals("send")){
@@ -104,12 +102,12 @@ public class Operations {
                         query.append(",");
                     }
                 }
-                System.out.println(query);
                 try(PreparedStatement ps = dbConnect.getConnection().prepareStatement(query.toString())){
                     for(int i = 0; i < goods.size(); i++) {
                         ps.setInt(i+1, goods.get(i));
                     }
                     ps.executeUpdate();
+                    flag = false;
                 }catch(SQLException e){e.printStackTrace();}
             }else {
                 int id = Integer.parseInt(enter);
@@ -120,37 +118,29 @@ public class Operations {
 
     public void selectClient(){
         try(PreparedStatement ps = dbConnect.getConnection().prepareStatement("SELECT * FROM clients")){
-            ResultSet resultSet = ps.executeQuery();
-            ResultSetMetaData metaData = resultSet.getMetaData();
-            for (int i = 1; i <= metaData.getColumnCount(); i++)
-                System.out.print(metaData.getColumnName(i) + "\t\t");
-            System.out.println();
-
-            while (resultSet.next()) {
-                for (int i = 1; i <= metaData.getColumnCount(); i++) {
-                    System.out.print(resultSet.getString(i) + "\t\t");
-                }
-                System.out.println();
-            }
+            selectContentOfTable(ps);
         }catch(SQLException e){e.printStackTrace();}
     }
 
 
-
     public void selectGoods(){
         try(PreparedStatement ps = dbConnect.getConnection().prepareStatement("SELECT * FROM goods")){
-            ResultSet resultSet = ps.executeQuery();
-            ResultSetMetaData metaData = resultSet.getMetaData();
-            for (int i = 1; i <= metaData.getColumnCount(); i++)
-                System.out.print(metaData.getColumnName(i) + "\t\t");
-            System.out.println();
-
-            while (resultSet.next()) {
-                for (int i = 1; i <= metaData.getColumnCount(); i++) {
-                    System.out.print(resultSet.getString(i) + "\t\t");
-                }
-                System.out.println();
-            }
+            selectContentOfTable(ps);
         }catch(SQLException e){e.printStackTrace();}
+    }
+
+    public void selectContentOfTable(PreparedStatement ps) throws SQLException{
+        ResultSet resultSet = ps.executeQuery();
+        ResultSetMetaData metaData = resultSet.getMetaData();
+        for (int i = 1; i <= metaData.getColumnCount(); i++)
+            System.out.print(metaData.getColumnName(i) + "\t\t");
+        System.out.println();
+
+        while (resultSet.next()) {
+            for (int i = 1; i <= metaData.getColumnCount(); i++) {
+                System.out.print(resultSet.getString(i) + "\t\t");
+            }
+            System.out.println();
+        }
     }
 }
