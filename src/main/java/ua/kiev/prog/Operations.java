@@ -79,6 +79,7 @@ public class Operations {
         query.append("INSERT INTO goodsinorders (id_good, id_order) VALUES");
         int id_order = 0;
         List<Integer> goods = new ArrayList<>();
+        selectClient();
         System.out.print("Enter the client for order: ");
         int id_client = Integer.parseInt(sc.nextLine());
         try(PreparedStatement ps = dbConnect.getConnection().
@@ -91,6 +92,7 @@ public class Operations {
                 id_order = rs.getInt(1);
             }
         }catch(SQLException e){e.printStackTrace();}
+        selectGoods();
 
         while(true) {
             System.out.println("Add new good into order(enter id): ");
@@ -114,5 +116,41 @@ public class Operations {
                 goods.add(id);
             }
         }
+    }
+
+    public void selectClient(){
+        try(PreparedStatement ps = dbConnect.getConnection().prepareStatement("SELECT * FROM clients")){
+            ResultSet resultSet = ps.executeQuery();
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            for (int i = 1; i <= metaData.getColumnCount(); i++)
+                System.out.print(metaData.getColumnName(i) + "\t\t");
+            System.out.println();
+
+            while (resultSet.next()) {
+                for (int i = 1; i <= metaData.getColumnCount(); i++) {
+                    System.out.print(resultSet.getString(i) + "\t\t");
+                }
+                System.out.println();
+            }
+        }catch(SQLException e){e.printStackTrace();}
+    }
+
+
+
+    public void selectGoods(){
+        try(PreparedStatement ps = dbConnect.getConnection().prepareStatement("SELECT * FROM goods")){
+            ResultSet resultSet = ps.executeQuery();
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            for (int i = 1; i <= metaData.getColumnCount(); i++)
+                System.out.print(metaData.getColumnName(i) + "\t\t");
+            System.out.println();
+
+            while (resultSet.next()) {
+                for (int i = 1; i <= metaData.getColumnCount(); i++) {
+                    System.out.print(resultSet.getString(i) + "\t\t");
+                }
+                System.out.println();
+            }
+        }catch(SQLException e){e.printStackTrace();}
     }
 }
