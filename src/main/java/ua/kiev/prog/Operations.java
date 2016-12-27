@@ -47,8 +47,6 @@ public class Operations {
                 addOrder();
                 break;
             case 4:
-                System.out.println("Cancel order:");
-                int numOfRoom = Integer.parseInt(sc.nextLine());
                 break;
             default:
                 break;
@@ -78,7 +76,7 @@ public class Operations {
 
     public void addOrder(){
         StringBuilder query = new StringBuilder();
-        query.append("INSERT INTO orders (id_client, date) VALUES");
+        query.append("INSERT INTO goodsinorders (id_good, id_order) VALUES");
         int id_order = 0;
         List<Integer> goods = new ArrayList<>();
         System.out.print("Enter the client for order: ");
@@ -104,22 +102,17 @@ public class Operations {
                         query.append(",");
                     }
                 }
+                System.out.println(query);
                 try(PreparedStatement ps = dbConnect.getConnection().prepareStatement(query.toString())){
-                    ps.setInt(1, id_client);
-                    ps.setDate(2, new java.sql.Date(new Date().getTime()));
-                    ps.executeUpdate();
-                    ResultSet rs = ps.getGeneratedKeys();
-                    if (rs.next()) {
-                        id_order = rs.getInt(1);
+                    for(int i = 0; i < goods.size(); i++) {
+                        ps.setInt(i+1, goods.get(i));
                     }
+                    ps.executeUpdate();
                 }catch(SQLException e){e.printStackTrace();}
             }else {
-                int id = Integer.parseInt(sc.nextLine());
+                int id = Integer.parseInt(enter);
                 goods.add(id);
             }
         }
-
-
-
     }
 }
