@@ -15,44 +15,9 @@ import java.util.Scanner;
  * Created by User on 21.12.2016.
  */
 public class Operations {
-    private DBConnect dbConnect;
     private Scanner sc;
 
-    public Operations(DBConnect dbConnect) {
-        this.dbConnect = dbConnect;
-        this.sc = new Scanner(System.in);
-
-        while(true){
-            System.out.println();
-            System.out.println("Choice an operation:");
-            System.out.println("1.Add new client");
-            System.out.println("2.Add new good");
-            System.out.println("3.Create new order");
-            System.out.println("4.Cancel new order");
-
-            int choice = Integer.parseInt(sc.nextLine());
-            select(choice);
-        }
-    }
-
-    public void select(int choice){
-        switch (choice){
-            case 1:
-                addClient();
-                break;
-            case 2:
-                addGood();
-                break;
-            case 3:
-                addOrder();
-                break;
-            case 4:
-                System.out.println("Cancel order:");
-                int numOfRoom = Integer.parseInt(sc.nextLine());
-                break;
-            default:
-                break;
-        }
+    public Operations() {
     }
 
     public void addClient(){
