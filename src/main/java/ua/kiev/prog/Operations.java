@@ -1,5 +1,6 @@
 package ua.kiev.prog;
 
+import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.Statement;
 
 import java.sql.PreparedStatement;
@@ -77,43 +78,52 @@ public class Operations {
         int id_order = 0;
         List<Integer> goods = new ArrayList<>();
         selectClient();
-        System.out.print("Enter the client for order: ");
-        int id_client = Integer.parseInt(sc.nextLine());
-        try(PreparedStatement ps = dbConnect.getConnection().
-                prepareStatement(("INSERT INTO orders (id_client, date) VALUES (?, ?)"), Statement.RETURN_GENERATED_KEYS)){
-            ps.setInt(1, id_client);
-            ps.setDate(2, new java.sql.Date(new Date().getTime()));
-            ps.executeUpdate();
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next()) {
-                id_order = rs.getInt(1);
+        try {
+            dbConnect.getConnection().setAutoCommit(false);
+            System.out.print("Enter the client for order: ");
+            int id_client = Integer.parseInt(sc.nextLine());
+            try (PreparedStatement ps = dbConnect.getConnection().
+                    prepareStatement(("INSERT INTO orders (id_client, date) VALUES (?, ?)"), Statement.RETURN_GENERATED_KEYS)) {
+                ps.setInt(1, id_client);
+                ps.setDate(2, new java.sql.Date(new Date().getTime()));
+                ps.executeUpdate();
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    id_order = rs.getInt(1);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            selectGoods();
+
+            boolean flag = true;
+            while (flag) {
+                System.out.println("Add new good into order(enter id): ");
+                String enter = sc.nextLine();
+                if (enter.equals("send")) {
+                    for (int i = 0; i < goods.size(); i++) {
+                        query.append("(?, " + id_order + ")");
+                        if (i != goods.size() - 1) {
+                            query.append(",");
+                        }
+                    }
+                    try (PreparedStatement ps = dbConnect.getConnection().prepareStatement(query.toString())) {
+                        for (int i = 0; i < goods.size(); i++) {
+                            ps.setInt(i + 1, goods.get(i));
+                        }
+                        ps.executeUpdate();
+                        dbConnect.getConnection().commit();
+                        flag = false;
+                    } catch (SQLException e) {
+                        dbConnect.getConnection().rollback();
+                        e.printStackTrace();
+                    }
+                } else {
+                    int id = Integer.parseInt(enter);
+                    goods.add(id);
+                }
             }
         }catch(SQLException e){e.printStackTrace();}
-        selectGoods();
-
-        boolean flag = true;
-        while(flag) {
-            System.out.println("Add new good into order(enter id): ");
-            String enter = sc.nextLine();
-            if(enter.equals("send")){
-                for(int i = 0; i < goods.size(); i++){
-                    query.append("(?, " + id_order + ")");
-                    if( i != goods.size() - 1){
-                        query.append(",");
-                    }
-                }
-                try(PreparedStatement ps = dbConnect.getConnection().prepareStatement(query.toString())){
-                    for(int i = 0; i < goods.size(); i++) {
-                        ps.setInt(i+1, goods.get(i));
-                    }
-                    ps.executeUpdate();
-                    flag = false;
-                }catch(SQLException e){e.printStackTrace();}
-            }else {
-                int id = Integer.parseInt(enter);
-                goods.add(id);
-            }
-        }
     }
 
     public void selectClient(){
